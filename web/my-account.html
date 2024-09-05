@@ -29,7 +29,7 @@
     </head>
 
 
-    <body class="sticky-header">
+    <body class="sticky-header" onload="loadFatures();">
         <!--[if lte IE 9]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
     <![endif]-->
@@ -241,20 +241,16 @@
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
                                                             <label>Category</label>
-                                                            <select>
-                                                                <option>Data 1</option>
-                                                                <option>Data 2</option>
-                                                                <option>Data 3</option>
+                                                            <select id="categorySelect">
+                                                                <option id="0">Select</option>
                                                             </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
                                                             <label>Model</label>
-                                                            <select>
-                                                                <option>Data 1</option>
-                                                                <option>Data 2</option>
-                                                                <option>Data 3</option>
+                                                            <select id="modelSelect">
+                                                                <option id="0">Select</option>
                                                             </select>
                                                         </div>
                                                     </div>                                                        
@@ -738,6 +734,8 @@
 
         <!-- Main JS -->
         <script src="assets/js/main.js"></script>
+        
+        <script src="assets/js/my-account.js"></script>
 
     </body>
 
