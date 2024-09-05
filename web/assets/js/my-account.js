@@ -13,8 +13,11 @@ async function loadFatures() {
         const storagelist = json.storagelist;
         const productConditionlist = json.productConditionlist;
 
-        loadSelect("categorySelect",categorylist);
-        loadSelect("modelSelect",modellist);
+        loadSelect("categorySelect",categorylist,["id","name"]);
+        loadSelect("modelSelect",modellist,["id","name"]);
+        loadSelect("storageSelect",storagelist,["id","value"]);
+        loadSelect("colorSelect",colorlist,["id","name"]);
+        loadSelect("conditionSelect",productConditionlist,["id","name"]);
 
     } else {
         document.getElementById("message").innerHTML = "Please try again Later ";
@@ -22,13 +25,13 @@ async function loadFatures() {
 
 }
 
-function loadSelect(selectTagId, list) {
+function loadSelect(selectTagId, list, propertyArray) {
 
     const SelectTag = document.getElementById(selectTagId);
     list.forEach(item => {
         let optionTag = document.createElement("option");
-        optionTag.value = item.id;
-        optionTag.innerHTML = item.name;
+        optionTag.value = item[propertyArray[0]];
+        optionTag.innerHTML = item[propertyArray[1]];
         SelectTag.appendChild(optionTag);
     });
 
