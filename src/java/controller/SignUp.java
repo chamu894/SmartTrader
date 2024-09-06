@@ -108,6 +108,7 @@ public class SignUp extends HttpServlet {
         }
         response.setContentType("application/json");
         response.getWriter().write(gson.toJson(response_DTO));
+        System.err.println(gson.toJson(response_DTO));
 
     }
 

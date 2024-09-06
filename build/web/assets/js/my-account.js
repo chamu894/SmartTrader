@@ -105,6 +105,8 @@ async function productListing() {
 
         } else {
 
+            console.log(json.content);
+
         }
 
     } else {
