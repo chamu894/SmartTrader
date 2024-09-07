@@ -98,10 +98,7 @@ async function productListing() {
     if (response.ok) {
         const json = await response.json();
 
-        console.log(json);
-
         if (json.success) {
-
 
         } else {
 

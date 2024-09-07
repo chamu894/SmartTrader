@@ -1,7 +1,6 @@
 package controller;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dto.Response_DTO;
 import entity.Category;
 import entity.Color;
@@ -9,7 +8,6 @@ import entity.Model;
 import entity.Product_Condition;
 import entity.Storage;
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -28,9 +26,9 @@ public class ProductListing extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        Gson gson = new Gson();
-
         Response_DTO response_DTO = new Response_DTO();
+
+        Gson gson = new Gson();
 
         String categoryId = request.getParameter("categoryId");
         String modelId = request.getParameter("modelId");
@@ -50,74 +48,96 @@ public class ProductListing extends HttpServlet {
 
         if (!Validation.isInteger(categoryId)) {
             response_DTO.setContent("Invalide Category");
+
         } else if (!Validation.isInteger(modelId)) {
             response_DTO.setContent("Invalide Model");
-        } else if (title.isEmpty()) {
-            response_DTO.setContent("Please fill Title");
-        } else if (description.isEmpty()) {
-            response_DTO.setContent("Please fill Description");
+
         } else if (!Validation.isInteger(storageId)) {
             response_DTO.setContent("Invalide Storage");
+
         } else if (!Validation.isInteger(colorId)) {
             response_DTO.setContent("Invalide Color");
+
         } else if (!Validation.isInteger(conditionId)) {
             response_DTO.setContent("Invalide Condition");
+
+        } else if (title.isEmpty()) {
+            response_DTO.setContent("Please fill Title");
+
+        } else if (description.isEmpty()) {
+            response_DTO.setContent("Please fill Description");
+
         } else if (price.isEmpty()) {
             response_DTO.setContent("Please fill Price");
+
         } else if (!Validation.isDouble(price)) {
             response_DTO.setContent("Invalide Price");
+
         } else if (Double.parseDouble(price) <= 0) {
             response_DTO.setContent("Price must be greater than 0");
+
         } else if (quantity.isEmpty()) {
             response_DTO.setContent("Please fill Quantity");
+
         } else if (!Validation.isInteger(quantity)) {
             response_DTO.setContent("Invalide Quantity");
+
         } else if (Integer.parseInt(quantity) <= 0) {
             response_DTO.setContent("Quantity must be greater than 0");
+
         } else if (image1.getSubmittedFileName() == null) {
             response_DTO.setContent("Please Upload image1");
+
         } else if (image2.getSubmittedFileName() == null) {
             response_DTO.setContent("Please Upload image2");
+
         } else if (image3.getSubmittedFileName() == null) {
             response_DTO.setContent("Please Upload image3");
+
         } else {
-            Category category = (Category) session.load(Category.class, Integer.parseInt(categoryId));
+
+            Category category = (Category) session.get(Category.class, Integer.parseInt(categoryId));
 
             if (category == null) {
                 response_DTO.setContent("Please Select a valid Category");
 
             } else {
 
-                Model model = (Model) session.load(Model.class, Integer.parseInt(modelId));
+                Model model = (Model) session.get(Model.class, Integer.parseInt(modelId));
 
                 if (model == null) {
                     response_DTO.setContent("Please Select a valid Model");
 
                 } else {
 
-                    Storage storage = (Storage) session.load(Storage.class, Integer.parseInt(storageId));
-
-                    if (storage == null) {
-                        response_DTO.setContent("Please Select a valid Storage");
+                    if (model.getCategory().getId() != category.getId()) {
+                        response_DTO.setContent("Please Select a valid Model");
 
                     } else {
 
-                        Color color = (Color) session.load(Color.class, Integer.parseInt(colorId));
+                        Storage storage = (Storage) session.get(Storage.class, Integer.parseInt(storageId));
 
-                        if (color == null) {
-                            response_DTO.setContent("Please Select a valid Color");
+                        if (storage == null) {
+                            response_DTO.setContent("Please Select a valid Storage");
 
                         } else {
 
-                            Product_Condition productCondition = (Product_Condition) session.load(Product_Condition.class, Integer.parseInt(conditionId));
+                            Color color = (Color) session.get(Color.class, Integer.parseInt(colorId));
 
-                            if (productCondition == null) {
-                                response_DTO.setContent("Please Select a valid Condition");
+                            if (color == null) {
+                                response_DTO.setContent("Please Select a valid Color");
 
+                            } else {
+
+                                Product_Condition condition = (Product_Condition) session.get(Product_Condition.class, Integer.parseInt(conditionId));
+
+                                if (condition == null) {
+                                    response_DTO.setContent("Please Select a valid Condition");
+
+                                }
                             }
                         }
                     }
-
                 }
 
             }

@@ -14,6 +14,7 @@
     <mapping class = "entity.Color"/>
     <mapping class = "entity.Storage"/>
     <mapping class = "entity.Product_Condition"/>
+    <mapping class = "entity.Product_Status"/>
   </session-factory>
 </hibernate-configuration>
 
