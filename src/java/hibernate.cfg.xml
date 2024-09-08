@@ -15,6 +15,7 @@
     <mapping class = "entity.Storage"/>
     <mapping class = "entity.Product_Condition"/>
     <mapping class = "entity.Product_Status"/>
+    <mapping class = "entity.Product"/>
   </session-factory>
 </hibernate-configuration>
 

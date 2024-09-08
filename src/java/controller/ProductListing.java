@@ -2,12 +2,21 @@ package controller;
 
 import com.google.gson.Gson;
 import dto.Response_DTO;
+import dto.User_DTO;
 import entity.Category;
 import entity.Color;
 import entity.Model;
+import entity.Product;
 import entity.Product_Condition;
+import entity.Product_Status;
 import entity.Storage;
+import entity.User;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -17,7 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import model.HibernateUtil;
 import model.Validation;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 @MultipartConfig
 @WebServlet(name = "ProductListing", urlPatterns = {"/ProductListing"})
@@ -134,19 +145,67 @@ public class ProductListing extends HttpServlet {
                                 if (condition == null) {
                                     response_DTO.setContent("Please Select a valid Condition");
 
+                                } else {
+
+                                    Product product = new Product();
+                                    product.setColor(color);
+                                    product.setDate_time(new Date());
+                                    product.setDescription(description);
+                                    product.setModel(model);
+                                    product.setPrice(Double.parseDouble(price));
+                                    product.setProduct_Condition(condition);
+
+                                    //get active status
+                                    Product_Status product_status = (Product_Status) session.load(Product_Status.class, 1);
+                                    product.setProduct_Status(product_status);
+
+                                    product.setQty(Integer.parseInt(quantity));
+                                    product.setStorage(storage);
+                                    product.setTitle(title);
+
+                                    //get user
+                                    User_DTO user_DTO = (User_DTO) request.getSession().getAttribute("user");
+                                    Criteria criteria1 = session.createCriteria(User.class);
+                                    criteria1.add(Restrictions.eq("email", user_DTO.getEmail()));
+                                    User user = (User) criteria1.uniqueResult();
+                                    product.setUser(user);
+
+                                    int pid = (int) session.save(product);
+                                    session.beginTransaction().commit();
+
+                                    String applicationPath = request.getServletContext().getRealPath("");
+                                    String newApplicationPath = applicationPath.replace("build/web", "web");
+
+                                    File folder = new File(newApplicationPath + "//product-images//" + pid);
+                                    folder.mkdir();
+
+                                    File file1 = new File(folder, "image1.png");
+                                    InputStream inputStream1 = image1.getInputStream();
+                                    Files.copy(inputStream1, file1.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                                    File file2 = new File(folder, "image2.png");
+                                    InputStream inputStream2 = image2.getInputStream();
+                                    Files.copy(inputStream2, file2.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                                    File file3 = new File(folder, "image3.png");
+                                    InputStream inputStream3 = image3.getInputStream();
+                                    Files.copy(inputStream3, file3.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                                    response_DTO.setSuccess(true);
+                                    response_DTO.setContent("New Product Added");
+
                                 }
                             }
                         }
                     }
                 }
-
             }
-
         }
 
         response.setContentType("application/json");
         response.getWriter().write(gson.toJson(response_DTO));
-        System.err.println(gson.toJson(response_DTO));
+        System.out.println(gson.toJson(response_DTO));
+        session.close();
 
     }
 
