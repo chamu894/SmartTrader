@@ -174,7 +174,7 @@ public class ProductListing extends HttpServlet {
                                     session.beginTransaction().commit();
 
                                     String applicationPath = request.getServletContext().getRealPath("");
-                                    String newApplicationPath = applicationPath.replace("build/web", "web");
+                                    String newApplicationPath = applicationPath.replace("build"+File.separator+"web", "web");
 
                                     File folder = new File(newApplicationPath + "//product-images//" + pid);
                                     folder.mkdir();
