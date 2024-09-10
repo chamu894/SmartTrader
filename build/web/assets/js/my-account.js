@@ -97,12 +97,33 @@ async function productListing() {
 
     if (response.ok) {
         const json = await response.json();
+        
+        const popup = Notification();
 
         if (json.success) {
 
-        } else {
+            categorySelectTag.value = 0;
+            modelSelectTag.length = 1;
+            titleTag.value = "";
+            descriptionTag.value = "";
+            storageSelectTag.value = 0;
+            colorSelectTag.value = 0;
+            conditionSelectTag.value = 0;
+            priceTag.value = "";
+            quantityTag.value = 1;
+            image1Tag.files = null;
+            image2Tag.files = null;
+            image3Tag.files = null;
+            
+            popup.success({
+                message: json.content,
+            });
 
-            console.log(json.content);
+        } else {
+            
+            popup.error({
+                message: json.content,
+            });
 
         }
 

@@ -28,6 +28,7 @@ import model.HibernateUtil;
 import model.Validation;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 @MultipartConfig
@@ -169,12 +170,14 @@ public class ProductListing extends HttpServlet {
                                     criteria1.add(Restrictions.eq("email", user_DTO.getEmail()));
                                     User user = (User) criteria1.uniqueResult();
                                     product.setUser(user);
+                                    
+                                    Transaction transaction = session.beginTransaction();
 
                                     int pid = (int) session.save(product);
-                                    session.beginTransaction().commit();
+                                    transaction.commit();
 
                                     String applicationPath = request.getServletContext().getRealPath("");
-                                    String newApplicationPath = applicationPath.replace("build"+File.separator+"web", "web");
+                                    String newApplicationPath = applicationPath.replace("build" + File.separator + "web", "web");
 
                                     File folder = new File(newApplicationPath + "//product-images//" + pid);
                                     folder.mkdir();
