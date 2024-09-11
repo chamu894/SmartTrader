@@ -1,75 +1,66 @@
-var modellist;
+var modelList;
+async function loadFeatures() {
 
-async function loadFatures() {
-
-    const response = await fetch(
-            "LoadFatures"
-            );
-
+    const response = await fetch("LoadFeatures");
     if (response.ok) {
+
         const json = await response.json();
-
-        const categorylist = json.categorylist;
-        modellist = json.modellist;
-        const colorlist = json.colorlist;
-        const storagelist = json.storagelist;
-        const productConditionlist = json.productConditionlist;
-
-        loadSelect("categorySelect", categorylist, "name");
-//        loadSelect("modelSelect", modellist, "name");
-        loadSelect("storageSelect", storagelist, "value");
-        loadSelect("colorSelect", colorlist, "name");
-        loadSelect("conditionSelect", productConditionlist, "name");
-
+        const categoryList = json.categoryList;
+        modelList = json.modelList;
+        const colorList = json.colorList;
+        const storageList = json.storageList;
+        const conditionList = json.conditionList;
+        loadSelectOptions("category-select", categoryList, ["id", "name"]);
+        loadSelectOptions("model-select", modelList, ["id", "name"]);
+        loadSelectOptions("color-select", colorList, ["id", "name"]);
+        loadSelectOptions("storage-select", storageList, ["id", "value"]);
+        loadSelectOptions("condition-select", conditionList, ["id", "name"]);
     } else {
-        document.getElementById("message").innerHTML = "Please try again Later ";
+        console.log("Error");
     }
 
 }
 
-function loadSelect(selectTagId, list, property) {
-
-    const SelectTag = document.getElementById(selectTagId);
+function loadSelectOptions(selectTagId, list, propertyArray) {
+    const selectTag = document.getElementById(selectTagId);
     list.forEach(item => {
         let optionTag = document.createElement("option");
-        optionTag.value = item.id;
-        optionTag.innerHTML = item[property];
-        SelectTag.appendChild(optionTag);
+        optionTag.value = item[propertyArray[0]];
+        optionTag.innerHTML = item[propertyArray[1]];
+        selectTag.appendChild(optionTag);
     });
-
 }
 
 function updateModels() {
 
-    let modelSelectTag = document.getElementById("modelSelect");
+    let modelSelectTag = document.getElementById("model-select");
     modelSelectTag.length = 1;
-
-    let selectCategoryId = document.getElementById("categorySelect").value;
-
-    modellist.forEach(model => {
-        if (model.category.id == selectCategoryId) {
+    let selectedCategoryId = document.getElementById("category-select").value;
+    modelList.forEach(model => {
+        if (model.category.id == selectedCategoryId) {
             let optionTag = document.createElement("option");
             optionTag.value = model.id;
             optionTag.innerHTML = model.name;
             modelSelectTag.appendChild(optionTag);
         }
     });
-
 }
 
 async function productListing() {
-    const categorySelectTag = document.getElementById("categorySelect");
-    const modelSelectTag = document.getElementById("modelSelect");
+
+    const categorySelectTag = document.getElementById("category-select");
+    const modelSelectTag = document.getElementById("model-select");
     const titleTag = document.getElementById("title");
     const descriptionTag = document.getElementById("description");
-    const storageSelectTag = document.getElementById("storageSelect");
-    const colorSelectTag = document.getElementById("colorSelect");
-    const conditionSelectTag = document.getElementById("conditionSelect");
+    const storageSelectTag = document.getElementById("storage-select");
+    const colorSelectTag = document.getElementById("color-select");
+    const conditionSelectTag = document.getElementById("condition-select");
     const priceTag = document.getElementById("price");
     const quantityTag = document.getElementById("quantity");
     const image1Tag = document.getElementById("image1");
     const image2Tag = document.getElementById("image2");
     const image3Tag = document.getElementById("image3");
+    const showMessage = document.getElementById("message");
 
     const data = new FormData();
     data.append("categoryId", categorySelectTag.value);
@@ -85,8 +76,6 @@ async function productListing() {
     data.append("image2", image2Tag.files[0]);
     data.append("image3", image3Tag.files[0]);
 
-
-
     const response = await fetch(
             "ProductListing",
             {
@@ -97,13 +86,12 @@ async function productListing() {
 
     if (response.ok) {
         const json = await response.json();
-        
+
         const popup = Notification();
 
         if (json.success) {
-
             categorySelectTag.value = 0;
-            modelSelectTag.length = 1;
+            modelSelectTag.value = 0;
             titleTag.value = "";
             descriptionTag.value = "";
             storageSelectTag.value = 0;
@@ -111,25 +99,23 @@ async function productListing() {
             conditionSelectTag.value = 0;
             priceTag.value = "";
             quantityTag.value = 1;
-            image1Tag.files = null;
-            image2Tag.files = null;
-            image3Tag.files = null;
-            
+            image1Tag.value = null;
+            image2Tag.value = null;
+            image3Tag.value = null;
+
             popup.success({
-                message: json.content,
+                message: json.content
             });
 
         } else {
-            
-            popup.error({
-                message: json.content,
-            });
 
+            popup.error({
+                message: json.content
+            });
         }
 
     } else {
-        document.getElementById("message").innerHTML = "Please try again Later ";
+        console.log("try agin");
     }
-
 
 }

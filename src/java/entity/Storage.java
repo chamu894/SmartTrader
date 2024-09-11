@@ -10,37 +10,44 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "storage")
-public class Storage implements Serializable{
-    
+public class Storage implements Serializable {
+
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
 
-    @Column(name = "value", length = 6, nullable = false)
+    @Column(name = "value", length = 8, nullable = false)
     private String value;
-    
-    public Storage(){}
 
+    public Storage() {
+    }
+
+    /**
+     * @return the id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * @param id the id to set
+     */
     public void setId(int id) {
         this.id = id;
     }
 
+    /**
+     * @return the value
+     */
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    /**
+     * @param value the name to set
+     */
+    public void setvalue(String value) {
         this.value = value;
     }
-
-    
-    
-    
-    
 }
-

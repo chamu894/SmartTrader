@@ -25,10 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import model.HibernateUtil;
-import model.Validation;
+import model.Validations;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 @MultipartConfig
@@ -58,20 +57,20 @@ public class ProductListing extends HttpServlet {
 
         Session session = HibernateUtil.getSessionFactory().openSession();
 
-        if (!Validation.isInteger(categoryId)) {
-            response_DTO.setContent("Invalide Category");
+        if (!Validations.isInteger(categoryId)) {
+            response_DTO.setContent("Invalid Category");
 
-        } else if (!Validation.isInteger(modelId)) {
-            response_DTO.setContent("Invalide Model");
+        } else if (!Validations.isInteger(modelId)) {
+            response_DTO.setContent("Invalid Model");
 
-        } else if (!Validation.isInteger(storageId)) {
-            response_DTO.setContent("Invalide Storage");
+        } else if (!Validations.isInteger(storageId)) {
+            response_DTO.setContent("Invalid Storage");
 
-        } else if (!Validation.isInteger(colorId)) {
-            response_DTO.setContent("Invalide Color");
+        } else if (!Validations.isInteger(colorId)) {
+            response_DTO.setContent("Invalid Color");
 
-        } else if (!Validation.isInteger(conditionId)) {
-            response_DTO.setContent("Invalide Condition");
+        } else if (!Validations.isInteger(conditionId)) {
+            response_DTO.setContent("Invalid Condition");
 
         } else if (title.isEmpty()) {
             response_DTO.setContent("Please fill Title");
@@ -82,109 +81,108 @@ public class ProductListing extends HttpServlet {
         } else if (price.isEmpty()) {
             response_DTO.setContent("Please fill Price");
 
-        } else if (!Validation.isDouble(price)) {
-            response_DTO.setContent("Invalide Price");
+        } else if (!Validations.isDouble(price)) {
+            response_DTO.setContent("Invalid price");
 
         } else if (Double.parseDouble(price) <= 0) {
             response_DTO.setContent("Price must be greater than 0");
 
         } else if (quantity.isEmpty()) {
-            response_DTO.setContent("Please fill Quantity");
+            response_DTO.setContent("Invalid Quantity");
 
-        } else if (!Validation.isInteger(quantity)) {
-            response_DTO.setContent("Invalide Quantity");
+        } else if (!Validations.isInteger(quantity)) {
+            response_DTO.setContent("Invalid Quantity");
 
         } else if (Integer.parseInt(quantity) <= 0) {
             response_DTO.setContent("Quantity must be greater than 0");
 
         } else if (image1.getSubmittedFileName() == null) {
-            response_DTO.setContent("Please Upload image1");
+            response_DTO.setContent("Please upload image1");
 
         } else if (image2.getSubmittedFileName() == null) {
-            response_DTO.setContent("Please Upload image2");
+            response_DTO.setContent("Please upload image2");
 
         } else if (image3.getSubmittedFileName() == null) {
-            response_DTO.setContent("Please Upload image3");
+            response_DTO.setContent("Please upload image3");
 
         } else {
 
             Category category = (Category) session.get(Category.class, Integer.parseInt(categoryId));
 
             if (category == null) {
-                response_DTO.setContent("Please Select a valid Category");
+                response_DTO.setContent("Please select a valid Category");
 
             } else {
 
                 Model model = (Model) session.get(Model.class, Integer.parseInt(modelId));
 
                 if (model == null) {
-                    response_DTO.setContent("Please Select a valid Model");
+                    response_DTO.setContent("Please select a valid Model");
 
                 } else {
 
                     if (model.getCategory().getId() != category.getId()) {
-                        response_DTO.setContent("Please Select a valid Model");
+                        response_DTO.setContent("Please select a valid Model");
 
                     } else {
 
                         Storage storage = (Storage) session.get(Storage.class, Integer.parseInt(storageId));
 
                         if (storage == null) {
-                            response_DTO.setContent("Please Select a valid Storage");
+                            response_DTO.setContent("Please select a valid Storage");
 
                         } else {
 
                             Color color = (Color) session.get(Color.class, Integer.parseInt(colorId));
 
                             if (color == null) {
-                                response_DTO.setContent("Please Select a valid Color");
+                                response_DTO.setContent("Please select a valid Color");
 
                             } else {
 
-                                Product_Condition condition = (Product_Condition) session.get(Product_Condition.class, Integer.parseInt(conditionId));
+                                Product_Condition product_Condition = (Product_Condition) session.get(Product_Condition.class, Integer.parseInt(conditionId));
 
-                                if (condition == null) {
-                                    response_DTO.setContent("Please Select a valid Condition");
+                                if (product_Condition == null) {
+                                    response_DTO.setContent("Please select a valid Product Condition");
 
                                 } else {
-
+                                    //to do Insert
                                     Product product = new Product();
                                     product.setColor(color);
                                     product.setDate_time(new Date());
                                     product.setDescription(description);
+                                    // product.setId(); auto increment
                                     product.setModel(model);
                                     product.setPrice(Double.parseDouble(price));
-                                    product.setProduct_Condition(condition);
 
                                     //get active status
-                                    Product_Status product_status = (Product_Status) session.load(Product_Status.class, 1);
-                                    product.setProduct_Status(product_status);
+                                    Product_Status product_Status = (Product_Status) session.load(Product_Status.class, 1);
+                                    product.setProduct_Status(product_Status);
 
+                                    product.setProduct_condition(product_Condition);
                                     product.setQty(Integer.parseInt(quantity));
                                     product.setStorage(storage);
                                     product.setTitle(title);
 
                                     //get user
                                     User_DTO user_DTO = (User_DTO) request.getSession().getAttribute("user");
-                                    Criteria criteria1 = session.createCriteria(User.class);
-                                    criteria1.add(Restrictions.eq("email", user_DTO.getEmail()));
-                                    User user = (User) criteria1.uniqueResult();
+                                    Criteria criteria = session.createCriteria(User.class);
+                                    criteria.add(Restrictions.eq("email", user_DTO.getEmail()));
+                                    User user = (User) criteria.uniqueResult();
                                     product.setUser(user);
-                                    
-                                    Transaction transaction = session.beginTransaction();
 
                                     int pid = (int) session.save(product);
-                                    transaction.commit();
+                                    session.beginTransaction().commit();
 
                                     String applicationPath = request.getServletContext().getRealPath("");
                                     String newApplicationPath = applicationPath.replace("build" + File.separator + "web", "web");
 
-                                    File folder = new File(newApplicationPath + "//product-images//" + pid);
+                                    File folder = new File(newApplicationPath + File.separator + "product-images" + File.separator + pid);
                                     folder.mkdir();
 
                                     File file1 = new File(folder, "image1.png");
-                                    InputStream inputStream1 = image1.getInputStream();
-                                    Files.copy(inputStream1, file1.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                                    InputStream inputStream = image1.getInputStream();
+                                    Files.copy(inputStream, file1.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
                                     File file2 = new File(folder, "image2.png");
                                     InputStream inputStream2 = image2.getInputStream();
@@ -195,21 +193,25 @@ public class ProductListing extends HttpServlet {
                                     Files.copy(inputStream3, file3.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
                                     response_DTO.setSuccess(true);
-                                    response_DTO.setContent("New Product Added");
+                                    response_DTO.setContent("Product Added Successfully!");
 
                                 }
+
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         }
 
+        session.close();
         response.setContentType("application/json");
         response.getWriter().write(gson.toJson(response_DTO));
-        System.out.println(gson.toJson(response_DTO));
-        session.close();
-
     }
 
 }
